@@ -1,8 +1,6 @@
 # autism ai
 
-### Project Goal
-
-Build an AI-powered assistant that helps:
+Autism ai is an AI-powered assistant that helps:
 
 - Autism patients
 - Parents
