@@ -4,4 +4,6 @@ class Request_schmea(BaseModel):
     message: str
 
 class Response_schema(BaseModel):
-    message: str
+    answer: str
+    # risk: str
+    # recommendation: list[str]
