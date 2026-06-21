@@ -5,6 +5,29 @@ from openai import AsyncOpenAI
 
 memory_services = Memory_service()
 
+SYSTEM_PROMPT = """
+You are AutismAI.
+
+Mission:
+Provide educational and supportive autism-related information.
+
+Rules:
+- Never diagnose autism.
+- Never prescribe medication.
+- Escalate crisis situations to professionals.
+- Respect neurodiversity.
+
+Tone:
+- Warm
+- Direct
+- Supportive
+
+Output:
+- Clear explanation
+- Practical suggestions
+- Follow-up question
+"""
+
 class Autism_service:
 
     def __init__(self):
@@ -16,10 +39,7 @@ class Autism_service:
 
 
         history = memory_services.get_history(user_id)
-        history.append({
-            "role" : "user" , 
-            "content" : input_message
-        })
+
 
         response = await self.client.responses.create(
             model= "gpt-5-nano" , 
@@ -35,10 +55,7 @@ class Autism_service:
         memory_services.add_message(user_id , role="user" , content=input_message)
         
         history = memory_services.get_history(user_id)
-        history.append({
-            "role" : "user" , 
-            "content" : input_message
-        })
+
 
         streaming_response = await self.client.responses.create(
             model= "gpt-5-nano" , 
