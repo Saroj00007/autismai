@@ -43,7 +43,8 @@ class Autism_service:
 
         response = await self.client.responses.create(
             model= "gpt-5-nano" , 
-            input= history[-10:]
+            input= history[-10:] , 
+            instructions= SYSTEM_PROMPT
         )
 
         memory_services.add_message(user_id , role="assistant" , content=response.output_text)
@@ -60,7 +61,9 @@ class Autism_service:
         streaming_response = await self.client.responses.create(
             model= "gpt-5-nano" , 
             input= history[-10:] , 
-            stream = True
+            stream = True , 
+            instructions= SYSTEM_PROMPT
+
         )
 
         full_response = ""
