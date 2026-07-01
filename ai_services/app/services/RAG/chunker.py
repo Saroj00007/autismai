@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from ingestion import DocumentPage
+from .ingestion import DocumentPage
 
 @dataclass
 class Chunk: 
@@ -10,8 +10,13 @@ class Chunk:
 
 class Chunker :
 
-    def __init__(self, chunk_size: int = 100):
+    def __init__(self, chunk_size: int = 100 , chunk_overlap = 20):
+        
+        if chunk_overlap >= chunk_size : 
+            raise ValueError("the chunk overlap must be smaller than the chunk_size")
+
         self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
 
     def chunk_document(self, pages: list[DocumentPage]) -> list[Chunk]:
 
@@ -22,6 +27,7 @@ class Chunker :
         for page in pages:
 
             text = page.text
+            step = self.chunk_size- self.chunk_overlap
 
             for start in range(0, len(text), self.chunk_size):
 

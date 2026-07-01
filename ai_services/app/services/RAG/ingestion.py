@@ -1,60 +1,87 @@
 from pathlib import Path
-import re
-from pypdf import PdfReader
-from dataclasses import dataclass
 
-@dataclass
-class DocumentPage: 
-    text : str 
-    page_number : int
-    source : str
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_core.documents import Document
 
 
-class DocumentLoader:
+def load_documents(folder_path: str) -> list[Document]:
+    folder = Path(folder_path)
 
-    def load_document(self, file_path: str) -> list[DocumentPage]:
-        """
-        Load any supported document type.
-        """
+    if not folder.exists():
+        raise FileNotFoundError(f"Knowledge folder not found: {folder}")
 
-        path = Path(file_path)
+    documents = []
 
-        if not path.exists():
-            raise FileNotFoundError(f"Document not found: {file_path}")
+    pdf_files = folder.glob("*.pdf")
 
-        suffix = path.suffix.lower()
+    for pdf_file in pdf_files:
+        loader = PyPDFLoader(str(pdf_file))
+        pdf_documents = loader.load()
 
-        if suffix == ".pdf":
-            text = self._load_pdf(path)
-        else:
-            raise ValueError(f"Unsupported file type: {suffix}")
+        documents.extend(pdf_documents)
 
-        return text
+        print(documents)
 
-    def _load_pdf(self, path: Path) -> list[DocumentPage]:
-        reader = PdfReader(path)
+    return documents
 
-        pages = []
 
-        for page_number , page in enumerate(reader.pages , start= 1):
+# from pathlib import Path
+# import re
+# from pypdf import PdfReader
+# from dataclasses import dataclass
 
-            text = page.extract_text()
+# @dataclass
+# class DocumentPage:
+#     text : str
+#     page_number : int
+#     source : str = "default.pdf"
 
-            #  yehi thau ma text clean pane gardida vayo
 
-            if text  :
-                cleaned = self.clean_text(text)
-                pages.append(
-                    DocumentPage(
-                      page_number=page_number ,
-                      text= cleaned
-                    )
-                )
+# class DocumentLoader:
 
-        return pages
+# def load_document(self, file_path: str) -> list[DocumentPage]:
+#     """
+#     Load any supported document type.
+#     """
 
-    def clean_text(self, text: str) -> str:
-        text = re.sub(r"[ \t]+", " ", text)
-        text = re.sub(r"\n{3,}", "\n\n", text)
+#     path = Path(file_path)
 
-        return text.strip()
+#     if not path.exists():
+#         raise FileNotFoundError(f"Document not found: {file_path}")
+
+#     suffix = path.suffix.lower()
+
+#     if suffix == ".pdf":
+#         text = self._load_pdf(path)
+#     else:
+#         raise ValueError(f"Unsupported file type: {suffix}")
+
+#     return text
+
+# def _load_pdf(self, path: Path) -> list[DocumentPage]:
+#     reader = PdfReader(path)
+
+#     pages = []
+
+#     for page_number , page in enumerate(reader.pages , start= 1):
+
+#         text = page.extract_text()
+
+#         #  yehi thau ma text clean pane gardida vayo
+
+#         if text  :
+#             cleaned = self.clean_text(text)
+#             pages.append(
+#                 DocumentPage(
+#                   page_number=page_number ,
+#                   text= cleaned
+#                 )
+#             )
+
+#     return pages
+
+# def clean_text(self, text: str) -> str:
+#     text = re.sub(r"[ \t]+", " ", text)
+#     text = re.sub(r"\n{3,}", "\n\n", text)
+
+#     return text.strip()
