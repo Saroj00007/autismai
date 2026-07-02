@@ -1,93 +1,16 @@
-from dataclasses import dataclass
-from .ingestion import DocumentPage
+from langchain_core.documents import Document
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-@dataclass
-class Chunk: 
-    id : str
-    content : str
-    source : str
-    page_number : int
+CHUNK_SIZE = 500
+CHUNK_OVERLAP = 100
 
-class Chunker :
-
-    def __init__(self, chunk_size: int = 100 , chunk_overlap = 20):
-        
-        if chunk_overlap >= chunk_size : 
-            raise ValueError("the chunk overlap must be smaller than the chunk_size")
-
-        self.chunk_size = chunk_size
-        self.chunk_overlap = chunk_overlap
-
-    def chunk_document(self, pages: list[DocumentPage]) -> list[Chunk]:
-
-        chunks = []
-
-        chunk_number = 1
-
-        for page in pages:
-
-            text = page.text
-            step = self.chunk_size- self.chunk_overlap
-
-            for start in range(0, len(text), self.chunk_size):
-
-                end = start + self.chunk_size
-
-                chunk_text = text[start:end]
-
-                chunks.append(
-                    Chunk(
-                        id=f"chunk_id : {chunk_number}",
-                        content=chunk_text,
-                        source=page.source,
-                        page_number=page.page_number,
-                    )
-                )
-                chunk_number = chunk_number + 1
-
-        return chunks
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=CHUNK_SIZE,
+    chunk_overlap=CHUNK_OVERLAP,
+)
 
 
-
-
-        # saftey 
-
-#         from services.rag.ingestion import DocumentPage
-
-# class Chunker:
-
-#     def __init__(self, chunk_size: int = 500):
-#         self.chunk_size = chunk_size
-
-#     def chunk_document(
-#         self,
-#         pages: list[DocumentPage]
-#     ) -> list[Chunk]:
-
-#         chunks = []
-
-#         chunk_number = 1
-
-#         for page in pages:
-
-#             text = page.text
-
-#             for start in range(0, len(text), self.chunk_size):
-
-#                 end = start + self.chunk_size
-
-#                 chunk_text = text[start:end]
-
-#                 chunks.append(
-#                     Chunk(
-#                         id=f"chunk_{chunk_number}",
-#                         content=chunk_text,
-#                         source=page.source,
-#                         page_number=page.page_number
-#                     )
-#                 )
-
-#                 chunk_number += 1
-
-#         return chunks
-          
+def chunk_documents(
+    documents: list[Document],
+) -> list[Document]:
+    return text_splitter.split_documents(documents)
