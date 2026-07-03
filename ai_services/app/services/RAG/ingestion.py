@@ -20,8 +20,6 @@ def load_documents(folder_path: str) -> list[Document]:
 
         documents.extend(pdf_documents)
 
-        print(documents)
-
     return documents
 
 
