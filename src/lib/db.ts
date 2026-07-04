@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const mongo_url = process.env.MONGODB_URL || " "; 
+const mongo_url = process.env.MONGODB_URL ; 
 
 // const mongo_url = "mongodb+srv://sarojstudy5856_db_user:Saroj123@cluster0.ujgchgb.mongodb.net/autismai"
  
@@ -11,11 +11,9 @@ if(!mongo_url){
 
 if (!global.mongoose) {
   global.mongoose = { conn: null, promise: null };
-}
+} 
 
 let cached = global.mongoose
-
-
 
 export async function dbconnect(){
   if(cached.conn){
@@ -23,7 +21,7 @@ export async function dbconnect(){
   }
   
    if (!cached.promise) {
-    cached.promise = mongoose.connect(mongo_url).then((mongoose) => {
+    cached.promise = mongoose.connect(mongo_url as string).then((mongoose) => {
       return mongoose;
     });
   }
@@ -31,6 +29,7 @@ export async function dbconnect(){
   const mongooseInstance = await cached.promise;
   cached.conn = mongooseInstance.connection; 
 
+  console.log(cached.conn)
   return cached.conn;
 }
 

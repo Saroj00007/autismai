@@ -2,9 +2,9 @@ import mongoose , {Document , Schema , Model} from "mongoose";
 
 
 interface Iuser extends Document{
-    name : String , 
-    email : String , 
-    password : String , 
+    name : string , 
+    email : string , 
+    password : string , 
     createdAt : Date , 
     UpdatedAt : Date
 }

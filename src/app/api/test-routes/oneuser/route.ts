@@ -1,1 +1,0 @@
-// write a logic to query over the database and retru the simgle user
