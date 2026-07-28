@@ -9,6 +9,9 @@ from app.services.autism_servicev2 import AutismServicev2
 from app.api.chat import chat_router
 from dotenv import load_dotenv
 
+from fastapi.middleware.cors import CORSMiddleware
+
+
 load_dotenv()
 
 @asynccontextmanager
@@ -32,6 +35,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(chat_router)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
