@@ -1,27 +1,27 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { Atkinson_Hyperlegible, JetBrains_Mono } from 'next/font/google';
+import { useEffect, useRef, useState } from "react";
+import { Atkinson_Hyperlegible, JetBrains_Mono } from "next/font/google";
 
 // Atkinson Hyperlegible is designed for readability — a natural fit here.
 const display = Atkinson_Hyperlegible({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-display',
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-display",
 });
 
 const mono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-mono',
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
 });
 
 // Point this at your backend. Expects POST { message, user_id } ->
 // { message, confidence, follo_up_questions }.
-const API_URL = 'http://localhost:8000/rag_chat';
-const DEFAULT_USER_ID = '0001';
+const API_URL = "http://localhost:8000/rag_chat";
+const DEFAULT_USER_ID = "0001";
 
-type Role = 'user' | 'bot';
+type Role = "user" | "bot";
 
 interface ChatMessage {
   id: string;
@@ -32,65 +32,77 @@ interface ChatMessage {
   followUps?: string[];
 }
 
-type Status = 'idle' | 'thinking' | 'error';
+type Status = "idle" | "thinking" | "error";
 
 export default function ChatDashboard() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
-  const [status, setStatus] = useState<Status>('idle');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [input, setInput] = useState("");
+  const [status, setStatus] = useState<Status>("idle");
+  const [errorMsg, setErrorMsg] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
+    listRef.current?.scrollTo({
+      top: listRef.current.scrollHeight,
+      behavior: "smooth",
+    });
   }, [messages, status]);
 
   async function sendMessage() {
     const text = input.trim();
-    if (!text || status === 'thinking') return;
+    if (!text || status === "thinking") return;
 
-    const userMsg: ChatMessage = { id: crypto.randomUUID(), role: 'user', text, time: timeNow() };
+    const userMsg: ChatMessage = {
+      id: crypto.randomUUID(),
+      role: "user",
+      text,
+      time: timeNow(),
+    };
     setMessages((m) => [...m, userMsg]);
-    setInput('');
-    setStatus('thinking');
-    setErrorMsg('');
+    setInput("");
+    setStatus("thinking");
+    setErrorMsg("");
 
     try {
       const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text, user_id: DEFAULT_USER_ID }),
       });
 
       if (!res.ok) throw new Error(`Server responded with ${res.status}`);
 
       const data = await res.json();
-      const answer = data.message ?? data.answer ?? 'No answer field in response.';
+      const answer =
+        data.message ?? data.answer ?? "No answer field in response.";
 
       setMessages((m) => [
         ...m,
         {
           id: crypto.randomUUID(),
-          role: 'bot',
+          role: "bot",
           text: String(answer),
           time: timeNow(),
-          confidence: typeof data.confidence === 'number' ? data.confidence : undefined,
-          followUps: Array.isArray(data.follo_up_questions) ? data.follo_up_questions : [],
+          confidence:
+            typeof data.confidence === "number" ? data.confidence : undefined,
+          followUps: Array.isArray(data.follo_up_questions)
+            ? data.follo_up_questions
+            : [],
         },
       ]);
-      setStatus('idle');
+      setStatus("idle");
     } catch (err) {
-      setStatus('error');
+      setStatus("error");
       setErrorMsg(
         err instanceof Error
           ? `Couldn't reach the assistant at ${API_URL}. ${err.message}`
-          : `Couldn't reach the assistant at ${API_URL}.`
+          : `Couldn't reach the assistant at ${API_URL}.`,
       );
     }
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
@@ -103,7 +115,9 @@ export default function ChatDashboard() {
           <span className="mark" aria-hidden="true" />
           <div>
             <div className="brand-name">AutismAI</div>
-            <div className="brand-sub">here to help, one question at a time</div>
+            <div className="brand-sub">
+              here to help, one question at a time
+            </div>
           </div>
         </div>
 
@@ -111,8 +125,8 @@ export default function ChatDashboard() {
           className="new-chat"
           onClick={() => {
             setMessages([]);
-            setStatus('idle');
-            setErrorMsg('');
+            setStatus("idle");
+            setErrorMsg("");
           }}
         >
           New conversation
@@ -136,8 +150,8 @@ export default function ChatDashboard() {
         <div className="thread" ref={listRef}>
           {messages.length === 0 && (
             <div className="empty">
-              Ask anything about autism — diagnoses, routines, communication, or support
-              strategies. Your questions stay on this screen only.
+              Ask anything about autism — diagnoses, routines, communication, or
+              support strategies. Your questions stay on this screen only.
             </div>
           )}
 
@@ -145,14 +159,18 @@ export default function ChatDashboard() {
             <div key={m.id} className={`bubble-row ${m.role}`}>
               <div className={`bubble ${m.role}`}>{m.text}</div>
 
-              {m.role === 'bot' && typeof m.confidence === 'number' && (
+              {m.role === "bot" && typeof m.confidence === "number" && (
                 <div className="confidence">Confidence: {m.confidence}%</div>
               )}
 
-              {m.role === 'bot' && m.followUps && m.followUps.length > 0 && (
+              {m.role === "bot" && m.followUps && m.followUps.length > 0 && (
                 <div className="follow-ups">
                   {m.followUps.map((q, i) => (
-                    <button key={i} className="follow-up-chip" onClick={() => setInput(q)}>
+                    <button
+                      key={i}
+                      className="follow-up-chip"
+                      onClick={() => setInput(q)}
+                    >
                       {q}
                     </button>
                   ))}
@@ -163,17 +181,23 @@ export default function ChatDashboard() {
             </div>
           ))}
 
-          {status === 'error' && <div className="error-banner">{errorMsg}</div>}
+          {status === "error" && <div className="error-banner">{errorMsg}</div>}
         </div>
 
         <div className="steps" role="status" aria-live="polite">
-          <div className={`step ${status === 'idle' ? 'active' : messages.length ? 'done' : ''}`}>
+          <div
+            className={`step ${status === "idle" ? "active" : messages.length ? "done" : ""}`}
+          >
             Listening
           </div>
-          <div className={`step ${status === 'thinking' ? 'active' : ''}`}>Thinking</div>
+          <div className={`step ${status === "thinking" ? "active" : ""}`}>
+            Thinking
+          </div>
           <div
             className={`step ${
-              status === 'idle' && messages.at(-1)?.role === 'bot' ? 'active' : ''
+              status === "idle" && messages.at(-1)?.role === "bot"
+                ? "active"
+                : ""
             }`}
           >
             Responding
@@ -188,7 +212,10 @@ export default function ChatDashboard() {
             placeholder="Type your question..."
             rows={2}
           />
-          <button onClick={sendMessage} disabled={!input.trim() || status === 'thinking'}>
+          <button
+            onClick={sendMessage}
+            disabled={!input.trim() || status === "thinking"}
+          >
             Send
           </button>
         </div>
@@ -206,6 +233,11 @@ export default function ChatDashboard() {
         * {
           box-sizing: border-box;
         }
+        html,
+        body {
+          height: 100%;
+          overflow: hidden;
+        }
         body {
           margin: 0;
           background: var(--canvas);
@@ -218,7 +250,9 @@ export default function ChatDashboard() {
           font-family: var(--font-display), system-ui, sans-serif;
           display: grid;
           grid-template-columns: 280px 1fr;
-          height: 100vh;
+          height: 100dvh;
+          max-height: 100dvh;
+          overflow: hidden;
           background: var(--canvas);
           color: var(--ink);
         }
@@ -228,6 +262,9 @@ export default function ChatDashboard() {
           display: flex;
           flex-direction: column;
           gap: 20px;
+          height: 100dvh;
+          flex-shrink: 0;
+          overflow: hidden;
         }
         .brand {
           display: flex;
@@ -318,10 +355,13 @@ export default function ChatDashboard() {
           display: flex;
           flex-direction: column;
           min-width: 0;
+          height: 100dvh;
+          overflow: hidden;
         }
         .header {
           padding: 28px 32px 16px;
           border-bottom: 1px solid rgba(42, 46, 43, 0.08);
+          flex-shrink: 0;
         }
         .header h1 {
           margin: 0 0 4px;
@@ -453,6 +493,7 @@ export default function ChatDashboard() {
           gap: 10px;
           padding: 16px 32px 28px;
           border-top: 1px solid rgba(42, 46, 43, 0.08);
+          flex-shrink: 0;
         }
         textarea {
           flex: 1;
@@ -491,5 +532,8 @@ export default function ChatDashboard() {
 }
 
 function timeNow() {
-  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
