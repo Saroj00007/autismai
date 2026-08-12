@@ -10,7 +10,6 @@ app.include_router(chat_router)
 @app.get("/")
 async def root():   
     
-
     return {
         "status" : "running" , 
         "time" : time.time()

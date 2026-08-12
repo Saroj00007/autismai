@@ -4,7 +4,6 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import Usermodel from "./model/userModel";
 import { dbconnect } from "./lib/db";
-import { use } from "react";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -31,7 +30,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        const isValidPassword =  bcrypt.compare(
+        const isValidPassword = await bcrypt.compare(
           credentials.password as string,
           user.password as string,
         );

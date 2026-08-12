@@ -1,65 +1,60 @@
-import Image from "next/image";
+import { SecondaryLink } from "@/src/components/ui/Button";
+import { Footer } from "@/src/components/ui/Footer";
+import { Navbar } from "@/src/components/ui/Navbar";
+import { ExpectationsGrid } from "@/src/components/marketing/ExpectationsGrid";
+import { FaqList } from "@/src/components/marketing/FaqList";
+import { LandingHero } from "@/src/components/marketing/LandingHero";
+import { auth } from "@/src/auth";
+import { signOutAction } from "@/src/auth-actions";
 
-export default function Home() {
+const HERO_TITLE =
+  "A calm space to ask, without needing to explain yourself first.";
+const HERO_SUBTITLE =
+  "AutismAI listens first and answers in plain, steady language — for autistic people, and for the people who support them.";
+
+const logOutButtonClass =
+  "cursor-pointer rounded-xl border border-border-strong bg-white px-4 py-1.5 text-sm font-medium text-ink-muted shadow-xs transition-all hover:bg-canvas-soft hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:cursor-not-allowed disabled:opacity-60";
+
+export default async function HomePage() {
+  const session = await auth();
+  const loggedIn = !!session?.user;
+  const firstName = session?.user?.name?.split(" ")[0] ?? null;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="min-h-screen bg-canvas text-ink-2">
+      <Navbar
+        rightSlot={
+          loggedIn ? (
+            <form action={signOutAction}>
+              <button type="submit" className={logOutButtonClass}>
+                Log out
+              </button>
+            </form>
+          ) : (
+            <SecondaryLink href="/login">Log in</SecondaryLink>
+          )
+        }
+      />
+
+      <LandingHero
+        chip={
+          loggedIn
+            ? `Welcome back, ${firstName ?? "there"}`
+            : "Quiet, clear, and built for the way you think"
+        }
+        title={HERO_TITLE}
+        subtitle={HERO_SUBTITLE}
+        cta={
+          loggedIn
+            ? { href: "/chatui", label: "Open chat" }
+            : { href: "/register", label: "Create your account" }
+        }
+        secondaryLink={{ href: "#expect", label: "See what to expect" }}
+      />
+
+      <ExpectationsGrid />
+      <FaqList />
+      <Footer tone="warning" />
     </div>
   );
 }

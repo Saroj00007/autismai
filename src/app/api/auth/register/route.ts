@@ -3,16 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbconnect } from "@/src/lib/db";
 import { authSchema } from "@/src/validation/auth.schema";
 import { regiseterUser } from "@/src/service/auth.service";
-import { success } from "zod";
-import { error } from "console";
 
 export async function POST(request: NextRequest) {
   try {
     const inputData = await request.json();
-    console.log(inputData)
 
     const validatedResut = authSchema.safeParse(inputData);
-    console.log(validatedResut?.success)
 
     if (validatedResut.success === false) {
       return NextResponse.json(

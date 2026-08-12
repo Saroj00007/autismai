@@ -55,3 +55,6 @@ async def rag_caht(request : Request , body : Request_schmea):
     AutismService = request.app.state.autism_service
 
     return await AutismService.generate_response(body.message)
+
+
+    

@@ -1,26 +1,29 @@
 import { dbconnect } from "@/src/lib/db";
-import Usermodel from "@/src/model/userModel";
 import { NextResponse } from "next/server";
 
-export async function GET(){
+export async function GET() {
+  try {
+    const connection = await dbconnect();
 
-    try {
-    const response = await dbconnect()
-
-    if(response){
-       return NextResponse.json({
-        success : true , 
-        message : "database connected successfully"
-       })
-    }
-        
-    } catch (error) {
-       return NextResponse.json({
-        success : false , 
-        message : "error occured during the database connection" , 
-        error : error
-       })
+    if (connection) {
+      return NextResponse.json(
+        { success: true, message: "database connected successfully" },
+        { status: 200 },
+      );
     }
 
-    
+    return NextResponse.json(
+      { success: false, message: "no connection" },
+      { status: 503 },
+    );
+  } catch (error) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "error occurred during the database connection",
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 503 },
+    );
+  }
 }
