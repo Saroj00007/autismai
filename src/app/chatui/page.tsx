@@ -6,7 +6,7 @@ import { LogoMark } from "@/src/components/ui/Logo";
 import styles from "./chat.module.css";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_CHAT_API_URL ?? "http://localhost:8000/rag_chat";
+  process.env.NEXT_PUBLIC_CHAT_API_URL ?? "https://autismai-oups.onrender.com/rag_chat";
 
 type Role = "user" | "bot";
 
