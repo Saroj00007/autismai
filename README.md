@@ -1,6 +1,6 @@
-# autism ai
+# NIVA
 
-Autism ai is an AI-powered assistant that helps:
+NIVA (Neurodiversity, Inclusion, Voice and Access) is an AI-powered assistant that helps:
 
 - Autism patients
 - Parents

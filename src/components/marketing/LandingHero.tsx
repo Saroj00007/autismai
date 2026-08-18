@@ -38,7 +38,7 @@ export function LandingHero({
           </p>
 
           <div className="relative mt-10 flex items-center justify-center lg:justify-start">
-            <GlowBackdrop className="rounded-2xl blur-xl" />
+            <GlowBackdrop className="rounded-md blur-xl" />
             <ButtonLink href={cta.href}>{cta.label}</ButtonLink>
           </div>
 
@@ -53,7 +53,7 @@ export function LandingHero({
         </div>
 
         <div className="relative">
-          <div className="group relative aspect-4/5 w-full max-w-md mx-auto overflow-hidden rounded-3xl border border-border bg-white shadow-2xl shadow-slate-900/10 sm:aspect-square">
+          <div className="group relative aspect-4/5 w-full max-w-md mx-auto overflow-hidden rounded-lg border border-border bg-white shadow-2xl shadow-slate-900/10 sm:aspect-square">
             <Image
               src="/child-puzzle.png"
               alt="A child sitting in front of a giant, colorful puzzle — a quiet moment of focus and discovery"
@@ -73,7 +73,7 @@ export function LandingHero({
             />
           </div>
 
-          <div className="absolute -bottom-6 -left-6 hidden -rotate-3 overflow-hidden rounded-2xl border border-border bg-white shadow-xl shadow-slate-900/10 sm:block w-44">
+          <div className="absolute -bottom-6 -left-6 hidden -rotate-3 overflow-hidden rounded-md border border-border bg-white shadow-xl shadow-slate-900/10 sm:block w-44">
             <div className="relative aspect-square">
               <Image
                 src="/rainbow-drawing.png"
@@ -87,7 +87,7 @@ export function LandingHero({
           </div>
 
           <div className="absolute -top-4 -right-2 hidden sm:block">
-            <div className="rounded-2xl border border-border bg-white/90 px-4 py-3 shadow-lg shadow-slate-900/5 backdrop-blur-md">
+            <div className="rounded-md border border-border bg-white/90 px-4 py-3 shadow-lg shadow-slate-900/5 backdrop-blur-md">
               <p className="text-[10px] font-bold tracking-[0.15em] text-ink-faint uppercase">
                 Private
               </p>

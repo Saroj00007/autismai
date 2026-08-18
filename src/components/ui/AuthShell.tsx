@@ -47,7 +47,7 @@ export function AuthShell({
   navbarRight,
   children,
   image = "child-playing",
-  imageEyebrow = "Welcome to AutismAI",
+  imageEyebrow = "Welcome to NIVA",
   imageTitle = "A calm space made for the way you think",
   imageSubtitle = "Listen first, answer in plain language, and never ask you to explain yourself first.",
 }: AuthShellProps) {

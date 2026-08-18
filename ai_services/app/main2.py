@@ -25,11 +25,11 @@ async def lifespan(app: FastAPI):
 
     app.state.autism_service = autism_service
 
-    print("✅ AutismAI initialized")
+    print("✅ NIVA initialized")
 
     yield
 
-    print("👋 AutismAI shutting down")
+    print("👋 NIVA shutting down")
 
 
 app = FastAPI(lifespan=lifespan)

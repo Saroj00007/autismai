@@ -20,14 +20,14 @@ export function Logo({ size = "md", className, ...rest }: LogoProps) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo.svg"
-          alt="AutismAI"
+          alt="NIVA"
           width={40}
           height={40}
           className="h-full w-full"
         />
       </span>
       <span className="font-display text-xl font-semibold tracking-tight text-ink">
-        Autism<span className="text-brand">AI</span>
+        N<span className="text-brand">IVA</span>
       </span>
     </span>
   );
@@ -44,7 +44,7 @@ export function LogoMark({ size = "md", className, ...rest }: LogoProps) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/logo-mark.svg"
-        alt="AutismAI"
+        alt="NIVA"
         width={40}
         height={40}
         className="h-full w-full"

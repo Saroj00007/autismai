@@ -16,9 +16,9 @@ const body = Lexend({
 });
 
 export const metadata: Metadata = {
-  title: "AutismAI — A calm space to ask",
+  title: "NIVA — A calm space to ask",
   description:
-    "AutismAI listens first and answers in plain, steady language — for autistic people, and for the people who support them.",
+    "NIVA listens first and answers in plain, steady language — for autistic people, and for the people who support them.",
 };
 
 export const viewport: Viewport = {

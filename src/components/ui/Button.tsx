@@ -19,16 +19,16 @@ type AnchorProps = CommonProps &
   };
 
 const basePrimary =
-  "group relative inline-flex items-center justify-center gap-3 rounded-2xl bg-ink px-8 py-4 font-sans text-base font-medium tracking-wide text-white shadow-xl shadow-slate-900/10 transition-all duration-300 hover:-translate-y-0.5 hover:bg-ink-2 hover:shadow-2xl focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-soft disabled:cursor-not-allowed disabled:opacity-60";
+  "group relative inline-flex items-center justify-center gap-3 rounded-md bg-ink px-8 py-4 font-sans text-base font-medium tracking-wide text-white shadow-xl shadow-slate-900/10 transition-all duration-300 hover:-translate-y-0.5 hover:bg-ink-2 hover:shadow-2xl focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-soft disabled:cursor-not-allowed disabled:opacity-60";
 
 const baseSecondary =
-  "cursor-pointer rounded-xl border border-border-strong bg-white px-4 py-1.5 text-sm font-medium text-ink-muted shadow-xs transition-all hover:bg-canvas-soft hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:cursor-not-allowed disabled:opacity-60";
+  "cursor-pointer rounded-md border border-border-strong bg-white px-4 py-1.5 text-sm font-medium text-ink-muted shadow-xs transition-all hover:bg-canvas-soft hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:cursor-not-allowed disabled:opacity-60";
 
 const baseGhost =
   "cursor-pointer font-medium text-ink-faint underline decoration-border-strong underline-offset-4 transition-colors hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-brand";
 
 const arrow =
-  "flex h-6 w-6 items-center justify-center rounded-lg bg-white/10 transition-transform duration-300 group-hover:translate-x-1 sm:h-7 sm:w-7";
+  "flex h-6 w-6 items-center justify-center rounded-sm bg-white/10 transition-transform duration-300 group-hover:translate-x-1 sm:h-7 sm:w-7";
 
 function classesFor(variant: Variant, extra?: string) {
   const base =

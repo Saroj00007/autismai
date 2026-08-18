@@ -9,9 +9,9 @@ type FooterProps = {
 
 const COPY = {
   calm:
-    "AutismAI is a support tool, not a medical or diagnostic service.",
+    "NIVA is a support tool, not a medical or diagnostic service.",
   warning:
-    "AutismAI is a support tool, not a medical or diagnostic service. In a crisis, please contact a professional or local emergency services.",
+    "NIVA is a support tool, not a medical or diagnostic service. In a crisis, please contact a professional or local emergency services.",
 } as const;
 
 export function Footer({ tone = "calm", children }: FooterProps) {

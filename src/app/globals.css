@@ -3,6 +3,7 @@
 :root {
   --canvas: #faf8f5;
   --canvas-soft: #f1f5f9;
+  --surface: #ffffff;
   --ink: #0f172a;
   --ink-2: #1e293b;
   --ink-muted: #475569;
@@ -15,9 +16,27 @@
   --success: #10b981;
 }
 
+html[data-theme="dark"] {
+  --canvas: #090909;
+  --canvas-soft: #161616;
+  --surface: #141414;
+  --ink: #f4f4f5;
+  --ink-2: #e4e4e7;
+  --ink-muted: #b4b4bc;
+  --ink-faint: #94949d;
+  --ink-fainter: #6f6f78;
+  --border: #29292e;
+  --border-strong: #3f3f46;
+  --brand: #a5c8ff;
+  --brand-soft: #263b5c;
+  --success: #34d399;
+  color-scheme: dark;
+}
+
 @theme inline {
   --color-canvas: var(--canvas);
   --color-canvas-soft: var(--canvas-soft);
+  --color-surface: var(--surface);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-ink-muted: var(--ink-muted);
@@ -37,6 +56,37 @@ body {
   color: var(--ink-faint);
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .bg-white\/90,
+html[data-theme="dark"] .bg-white\/80,
+html[data-theme="dark"] .bg-white\/60,
+html[data-theme="dark"] .bg-white\/50,
+html[data-theme="dark"] .bg-white\/40 {
+  background-color: var(--surface);
+}
+
+html[data-theme="dark"] .bg-\[\#efe7d8\] {
+  background-color: #222226;
+}
+
+html[data-theme="dark"] .bg-\[\#edf3ee\] {
+  background-color: #14211a;
+}
+
+html[data-theme="dark"] .bg-\[\#fffaf0\] {
+  background-color: #211c14;
+}
+
+/* `bg-ink` is intentionally light in the dark theme for readable body copy.
+   Primary controls using it need a dark foreground rather than white text. */
+html[data-theme="dark"] .bg-ink.text-white {
+  color: var(--canvas);
+}
+
+html[data-theme="dark"] .bg-ink .text-white {
+  color: var(--canvas);
 }
 
 /* The hero photo is pre-sharpened at the source. A gentle filter pass here

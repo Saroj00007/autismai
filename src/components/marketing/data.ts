@@ -16,7 +16,7 @@ export const EXPECTATIONS = [
 export const FAQS = [
   {
     q: "Is this therapy?",
-    a: "No. AutismAI is a place to think things through and get grounded answers. It doesn't replace a clinician, therapist, or doctor.",
+    a: "No. NIVA is a place to think things through and get grounded answers. It doesn't replace a clinician, therapist, or doctor.",
   },
   {
     q: "Who is this for?",

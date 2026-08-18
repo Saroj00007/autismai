@@ -25,7 +25,7 @@ export function ExpectationsGrid({
               A steady, predictable experience — every time.
             </h2>
           </div>
-          <div className="relative hidden h-20 w-32 shrink-0 overflow-hidden rounded-2xl border border-border shadow-2xs sm:block">
+          <div className="relative hidden h-20 w-32 shrink-0 overflow-hidden rounded-md border border-border shadow-2xs sm:block">
             <Image
               src="/child-therapist.png"
               alt=""
@@ -40,7 +40,7 @@ export function ExpectationsGrid({
           {items.map((item, idx) => (
             <div
               key={item.title}
-              className="group relative rounded-2xl border border-border bg-canvas/80 p-6 shadow-2xs transition-all hover:-translate-y-0.5 hover:shadow-md"
+              className="group relative rounded-md border border-border bg-canvas/80 p-6 shadow-2xs transition-all hover:-translate-y-0.5 hover:shadow-md"
             >
               <span className="absolute right-5 top-5 font-display text-xs font-semibold text-ink-fainter">
                 0{idx + 1}

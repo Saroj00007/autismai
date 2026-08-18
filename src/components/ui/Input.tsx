@@ -5,7 +5,7 @@ import type {
 } from "react";
 
 const inputBase =
-  "mt-2 w-full rounded-xl border border-border bg-canvas/80 px-4 py-3 text-sm text-ink placeholder-ink-fainter transition-all focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20";
+  "mt-2 w-full rounded-md border border-border bg-canvas/80 px-4 py-3 text-sm text-ink placeholder-ink-fainter transition-all focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20";
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   className?: string;
@@ -37,9 +37,9 @@ type AlertKind = "error" | "success";
 
 const alertBase: Record<AlertKind, string> = {
   error:
-    "rounded-xl border border-red-200 bg-red-50 p-3.5 text-center text-xs font-medium text-red-600",
+    "rounded-md border border-red-200 bg-red-50 p-3.5 text-center text-xs font-medium text-red-600",
   success:
-    "rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-center text-xs font-medium text-emerald-700",
+    "rounded-md border border-emerald-200 bg-emerald-50 p-3.5 text-center text-xs font-medium text-emerald-700",
 };
 
 export function Alert({ kind, children }: { kind: AlertKind; children: ReactNode }) {

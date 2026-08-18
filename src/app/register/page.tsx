@@ -69,7 +69,7 @@ export default function Register() {
           Create an account
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-faint">
-          Join AutismAI for a calm, quiet space to get clear answers.
+          Join NIVA for a calm, quiet space to get clear answers.
         </p>
       </div>
 

@@ -50,11 +50,29 @@ async def stream_chat(request :Request_schmea):
 
 
 @chat_router.post("/rag_chat" )
-async def rag_caht(request : Request , body : Request_schmea):
+async def rag_chat(request : Request , body : Request_schmea):
 
     AutismService = request.app.state.autism_service
 
     return await AutismService.generate_response(body.message)
+
+
+@chat_router.post("/rag_chat/stream")
+async def stream_rag_chat(request: Request, body: Request_schmea):
+    autism_service = request.app.state.autism_service
+
+    async def generate():
+        async for chunk in autism_service.generate_stream_response(body.message):
+            yield chunk
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/plain; charset=utf-8",
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
     

@@ -22,7 +22,7 @@ export function FaqList({ eyebrow = "Common questions", items = FAQS }: FaqListP
           <h2 className="mt-3 font-display text-2xl font-semibold leading-tight text-ink sm:text-3xl">
             Clear answers to the questions people ask first.
           </h2>
-          <div className="relative mt-8 hidden aspect-4/3 w-full max-w-xs overflow-hidden rounded-2xl border border-border shadow-2xs lg:block">
+          <div className="relative mt-8 hidden aspect-4/3 w-full max-w-xs overflow-hidden rounded-md border border-border shadow-2xs lg:block">
             <Image
               src="/child-playing.png"
               alt=""

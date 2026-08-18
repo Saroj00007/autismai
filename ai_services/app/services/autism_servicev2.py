@@ -7,3 +7,7 @@ class AutismServicev2:
 
     async def generate_response(self, message: str):
         return await self.rag_service.generate_response(message)
+
+    async def generate_stream_response(self, message: str):
+        async for chunk in self.rag_service.generate_stream_response(message):
+            yield chunk

@@ -45,6 +45,22 @@ class RAGservice :
     
         return response.output_parsed
 
+    async def generate_stream_response(self, question: str):
+        """Yield the RAG answer as soon as each text delta is available."""
+        ret_documents = self.retriever.invoke(question)
+        context = build_context(documents=ret_documents)
+        prompt = build_user_prompt(question=question, context=context)
+
+        stream = await self.client.responses.create(
+            model="gpt-5-nano",
+            input=prompt,
+            instructions=SYSTEM_INSTRUCTIONS,
+            stream=True,
+        )
+
+        async for event in stream:
+            if event.type == "response.output_text.delta":
+                yield event.delta
+
     
      
-

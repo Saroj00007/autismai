@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 import { LogoMark } from "@/src/components/ui/Logo";
+import { ThemeToggle } from "@/src/components/ui/ThemeToggle";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_CHAT_API_URL ?? "https://autismai-oups.onrender.com/rag_chat";
+  process.env.NEXT_PUBLIC_CHAT_API_URL ?? "https://autismai-oups.onrender.com/rag_chat/stream";
 
 type Role = "user" | "bot";
 
@@ -26,10 +28,11 @@ interface Conversation {
   messageCount: number;
 }
 
-type Status = "idle" | "thinking" | "error";
+type Status = "idle" | "connecting" | "streaming" | "error";
 
 function statusLabel(status: Status): string {
-  if (status === "thinking") return "Thinking…";
+  if (status === "connecting") return "Connecting…";
+  if (status === "streaming") return "NIVA is responding";
   if (status === "error") return "Disconnected";
   return "Ready";
 }
@@ -229,7 +232,7 @@ export default function ChatDashboard() {
 
   async function sendMessage() {
     const text = input.trim();
-    if (!text || status === "thinking") return;
+    if (!text || status === "connecting" || status === "streaming") return;
 
     const userId =
       (session?.user as { id?: string } | undefined)?.id ?? "0001";
@@ -242,7 +245,7 @@ export default function ChatDashboard() {
     };
     setMessages((m) => [...m, userMsg]);
     setInput("");
-    setStatus("thinking");
+    setStatus("connecting");
     setErrorMsg("");
 
     // Create conversation if needed
@@ -272,36 +275,55 @@ export default function ChatDashboard() {
 
       if (!res.ok) throw new Error(`Server responded with ${res.status}`);
 
-      const data = await res.json();
-      const answer =
-        data.message ?? data.answer ?? "No answer field in response.";
+      if (!res.body) throw new Error("The assistant did not return a response stream.");
 
-      const botConfidence =
-        typeof data.confidence === "number" ? data.confidence : undefined;
-      const botFollowUps = Array.isArray(data.follo_up_questions)
-        ? data.follo_up_questions
-        : [];
+      setStatus("streaming");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      const botMessageId = crypto.randomUUID();
+      let answer = "";
+      let receivedText = false;
 
-      setMessages((m) => [
-        ...m,
-        {
-          id: crypto.randomUUID(),
-          role: "bot",
-          text: String(answer),
-          time: timeNow(),
-          confidence: botConfidence,
-          followUps: botFollowUps,
-        },
-      ]);
+      const appendChunk = (chunk: string) => {
+        if (!chunk) return;
+        answer += chunk;
+        const isFirstChunk = !receivedText;
+        receivedText = true;
+        setMessages((messages) => {
+          if (isFirstChunk) {
+            return [
+              ...messages,
+              { id: botMessageId, role: "bot", text: answer, time: timeNow() },
+            ];
+          }
+          return messages.map((message) =>
+            message.id === botMessageId ? { ...message, text: answer } : message,
+          );
+        });
+      };
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        appendChunk(decoder.decode(value, { stream: true }));
+      }
+      appendChunk(decoder.decode());
+
+      if (!receivedText) {
+        throw new Error("The assistant returned an empty response.");
+      }
 
       // Save bot message
       if (convId) {
-        await saveMessage(convId, "bot", String(answer), botConfidence, botFollowUps);
+        await saveMessage(convId, "bot", answer);
       }
 
       setStatus("idle");
     } catch (err) {
-      if ((err as { name?: string })?.name === "AbortError") return;
+      if ((err as { name?: string })?.name === "AbortError") {
+        setStatus("idle");
+        return;
+      }
       setStatus("error");
       setErrorMsg(
         err instanceof Error
@@ -320,6 +342,12 @@ export default function ChatDashboard() {
     }
   }
 
+  function stopGenerating() {
+    abortRef.current?.abort();
+  }
+
+  const isGenerating = status === "connecting" || status === "streaming";
+
   if (sessionStatus === "loading" || isLoadingConversations) {
     return (
       <div className="h-dvh w-full flex items-center justify-center bg-[var(--canvas)]">
@@ -334,15 +362,18 @@ export default function ChatDashboard() {
       <aside
         ref={sidebarRef}
         style={{ width: `${sidebarWidth}px`, minWidth: '200px', maxWidth: '400px' }}
-        className="border-r border-[var(--border)] flex flex-col h-dvh shrink-0 overflow-hidden bg-white/50 relative"
+        className="border-r border-[var(--border)] flex flex-col h-dvh shrink-0 overflow-hidden bg-[var(--surface)] relative"
       >
         {/* Brand */}
-        <div className="flex items-center gap-3 p-6 pb-0">
-          <LogoMark size="md" />
-          <div>
-            <div className="font-display font-bold text-base text-[var(--ink)] leading-tight">AutismAI</div>
-            <div className="text-xs text-[var(--ink-faint)] mt-0.5">here to help, one question at a time</div>
-          </div>
+        <div className="flex items-start justify-between gap-2 p-6 pb-0">
+          <Link href="/" className="flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5f7f6e]">
+            <LogoMark size="md" />
+            <div>
+              <div className="font-display font-bold text-base text-[var(--ink)] leading-tight">NIVA</div>
+              <div className="text-xs text-[var(--ink-faint)] mt-0.5">voice, access, one question at a time</div>
+            </div>
+          </Link>
+          <ThemeToggle />
         </div>
 
         {/* New Chat Button */}
@@ -391,14 +422,23 @@ export default function ChatDashboard() {
           )}
         </div>
 
-        {/* Status */}
-        <div className="flex items-center gap-2.5 text-xs text-[var(--ink-faint)] p-6 pt-4">
+        {/* Status and account actions */}
+        <div className="border-t border-[var(--border)] p-4">
+          <div className="flex items-center gap-2.5 px-2 pb-3 text-xs text-[var(--ink-faint)]">
           <span
             className={`w-2 h-2 rounded-full shrink-0 ${
-              status === "thinking" ? 'bg-[#d4a04a]' : status === "error" ? 'bg-[#b3543f]' : 'bg-[#5f7f6e]'
+              isGenerating ? 'bg-[#d4a04a]' : status === "error" ? 'bg-[#b3543f]' : 'bg-[#5f7f6e]'
             }`}
           />
           <span>{statusLabel(status)}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="w-full border border-[var(--border)] px-3 py-2 text-left text-sm font-medium text-[var(--ink-muted)] transition-colors hover:bg-white hover:text-[var(--ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5f7f6e]"
+          >
+            Log out
+          </button>
         </div>
 
         {/* Resize Handle */}
@@ -413,7 +453,7 @@ export default function ChatDashboard() {
         <div className="flex-1 w-full max-w-[900px] mx-auto pt-8 px-8 flex flex-col min-h-0">
           <h1 className="font-display text-[22px] font-semibold text-[var(--ink)] mb-1 -tracking-tight">Ask a question</h1>
           <p className="text-sm text-[var(--ink-faint)] mb-6">
-            Answers come from your AutismAI assistant. Take your time.
+            Answers stream from your NIVA assistant. Take your time.
           </p>
 
           {/* Messages Thread */}
@@ -421,7 +461,7 @@ export default function ChatDashboard() {
             ref={listRef}
             className="flex-1 overflow-y-auto py-2 pb-6 flex flex-col gap-4"
             aria-live="polite"
-            aria-busy={status === "thinking"}
+            aria-busy={isGenerating}
           >
             {messages.length === 0 && (
               <div className="mt-[14vh] mx-auto max-w-[480px] text-center text-sm text-[var(--ink-faint)] leading-relaxed">
@@ -472,12 +512,15 @@ export default function ChatDashboard() {
             ))}
 
             {/* Typing Indicator */}
-            {status === "thinking" && (
-              <div className="flex flex-col items-start" aria-label="Assistant is typing">
-                <div className="inline-flex items-center gap-1.5 py-3.5 px-4 bg-[#efe7d8] text-[var(--ink)] min-h-11 rounded-sm">
-                  <span className="w-[7px] h-[7px] rounded-full bg-[#5f7f6e] opacity-40 animate-pulse" style={{ animationDelay: '0s' }} />
-                  <span className="w-[7px] h-[7px] rounded-full bg-[#5f7f6e] opacity-40 animate-pulse" style={{ animationDelay: '0.15s' }} />
-                  <span className="w-[7px] h-[7px] rounded-full bg-[#5f7f6e] opacity-40 animate-pulse" style={{ animationDelay: '0.3s' }} />
+            {status === "connecting" && (
+              <div className="max-w-[80%] self-start border border-[var(--border)] bg-[var(--surface)] px-4 py-3 shadow-sm" aria-label="NIVA is thinking">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[var(--ink-muted)]">
+                  <span className="h-2 w-2 animate-pulse bg-[#5f7f6e]" />
+                  NIVA is thinking
+                </div>
+                <div className="mt-3 space-y-2" aria-hidden="true">
+                  <div className="h-2 w-52 animate-pulse bg-[var(--canvas-soft)]" />
+                  <div className="h-2 w-36 animate-pulse bg-[var(--canvas-soft)] [animation-delay:150ms]" />
                 </div>
               </div>
             )}
@@ -498,17 +541,21 @@ export default function ChatDashboard() {
               onKeyDown={handleKeyDown}
               placeholder="Type your question..."
               rows={1}
-              className="flex-1 resize-none border border-[var(--border)] rounded py-3 px-4 font-sans text-[14.5px] leading-relaxed bg-white text-[var(--ink)] min-h-11 max-h-50 transition-colors focus:outline-none focus:border-[#5f7f6e] focus:ring-[2px] focus:ring-[#5f7f6e]/10"
+              className="flex-1 resize-none border border-[var(--border)] rounded py-3 px-4 font-sans text-[14.5px] leading-relaxed bg-[var(--surface)] text-[var(--ink)] min-h-11 max-h-50 transition-colors focus:outline-none focus:border-[#5f7f6e] focus:ring-[2px] focus:ring-[#5f7f6e]/10"
             />
             <button
-              onClick={sendMessage}
-              disabled={!input.trim() || status === "thinking"}
-              className="w-11 h-11 rounded bg-[#5f7f6e] text-white border-0 cursor-pointer inline-flex items-center justify-center shrink-0 transition-colors hover:bg-[#4f6e5e] disabled:opacity-40 disabled:cursor-not-allowed"
-              aria-label="Send message"
+              onClick={isGenerating ? stopGenerating : sendMessage}
+              disabled={isGenerating ? false : !input.trim()}
+              className="h-11 min-w-11 rounded bg-[#5f7f6e] px-3 text-white border-0 cursor-pointer inline-flex items-center justify-center shrink-0 transition-colors hover:bg-[#4f6e5e] disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label={isGenerating ? "Stop generating" : "Send message"}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M3.4 20.4l17.6-7.6L3.4 5.2l-.4 6.4 12.6 1.2-12.6 1.2.4 6.4z" fill="currentColor" />
-              </svg>
+              {isGenerating ? (
+                <span className="text-xs font-semibold">Stop</span>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M3.4 20.4l17.6-7.6L3.4 5.2l-.4 6.4 12.6 1.2-12.6 1.2.4 6.4z" fill="currentColor" />
+                </svg>
+              )}
             </button>
           </div>
         </div>
